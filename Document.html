@@ -1,0 +1,75 @@
+<button onclick="printdoc()">Print</button>
+<button onclick="savesource()">Save</button>
+<button onclick="loadsource()">Load</button>
+<button onclick="sizeconvert()">Convert</button>
+<button onclick="newdoc()">New</button><br>
+<input type="text" placeholder="Select your font" id="fontface" oninput="fontselect()">
+<input type="text" placeholder="Title" id="title" oninput="settitle()"><br>
+<b>Strg</b> + <b>s</b> to save the document on the desktop<br>
+<b>Strg</b> + <b>b</b> for bold text<br>
+<b>Strg</b> + <b>i</b> for italic text<br>
+<b>Strg</b> + <b>u</b> for underlined text<br>
+<i>++</i> for bigger text, <i>--</i> for smaller text<br>
+<i>~~</i> to start a new side<br>
+<textarea hidden id="source1"></textarea><button id="loadit" hidden onclick="loaditnow()">Load</button>
+<p id="source2"></p>
+<div id="documents" contenteditable="true" style="background-color:lightblue;border-radius:5px;border:5px ridge;font-size:12px;padding:5px">Edit here</div>
+<script>
+function sizeconvert(){
+	for (letter in document.getElementById("documents").innerHTML){
+		document.getElementById("documents").innerHTML=document.getElementById("documents").innerHTML.replace("++","<big>").replace("--","<small>").replace("~~","<hr><hr class='break'>");
+	}
+}
+function savesource(){
+	alert("Copying the document");
+	val=document.getElementById("documents").innerHTML
+	navigator.clipboard.writeText(val);
+	alert("Document ready for Load\nLoad document with Strg + V");
+	
+}
+function loadsource(){
+	document.getElementById("source1").hidden=false;
+	document.getElementById("loadit").hidden=false;
+}
+function loaditnow(){
+	source=document.getElementById("source1");
+	document.getElementById("loadit").hidden=true;
+	source.hidden=true;
+	document.getElementById("documents").innerHTML=source.value;
+	source.value="";
+}
+function newdoc(){
+	alert("Copying the document");
+	val=document.getElementById("documents").innerHTML
+	navigator.clipboard.writeText(val);
+	alert("Document ready for Load\nLoad document with Strg + V");
+	document.getElementById("source1").hidden=true;
+	document.getElementById("loadit").hidden=true;
+	document.getElementById("source2").innerHTML="";
+	document.getElementById("documents").innerHTML="Edit here";
+	alert("Created new document");
+}
+function fontselect(){
+	document.getElementById("documents").style.fontFamily=document.getElementById("fontface").value
+}
+function settitle(){
+	document.title=document.getElementById("title").value
+}
+function printdoc(){
+	alert("Copying the document");
+	val=document.getElementById("documents").innerHTML
+	val='<div style="font-size:12px;padding:5px;font-family:'+document.getElementById("fontface").value+'">'+val+'</div>'
+	navigator.clipboard.writeText(val);
+	val+='<style>.break {page-break-before: always;}</style>'
+	alert("Document ready for Load\nLoad document with Strg + V");
+	document.open()
+	alert("Generating Print")
+	document.write(val)
+	document.close()
+	alert("Opening Printer")
+	print()
+}
+</script>
+
+
+
