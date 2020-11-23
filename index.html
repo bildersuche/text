@@ -2,23 +2,95 @@
 <button onclick="savesource()">Save</button>
 <button onclick="loadsource()">Load</button>
 <button onclick="sizeconvert()">Convert</button>
-<button onclick="newdoc()">New</button><br>
+<button onclick="newdoc()">New</button>
+<button onclick="convertimage()">Convert Image</button><br>
 <input type="text" placeholder="Select your font" id="fontface" oninput="fontselect()">
-<input type="text" placeholder="Title" id="title" oninput="settitle()"><br>
+<input type="text" placeholder="Title" id="title" oninput="settitle()"><input placeholder="Image width" id="imagewidth" oninput="setimage()"><br>
 <b>Strg</b> + <b>s</b> to save the document on the desktop<br>
 <b>Strg</b> + <b>b</b> for bold text<br>
 <b>Strg</b> + <b>i</b> for italic text<br>
 <b>Strg</b> + <b>u</b> for underlined text<br>
+<i>&gt;</i> for a highlight in the line<br>
 <i>++</i> for bigger text, <i>--</i> for smaller text<br>
-<i>~~</i> to start a new side<br>
+<i>~~</i> to start a new side, ° start/end of strikethrough<br>
+Tables:<br>
+` start/stop of table, _ start/stop of row<br>
+# start/stop of cell, * start/stop of first cell<br>
 <textarea hidden id="source1"></textarea><button id="loadit" hidden onclick="loaditnow()">Load</button>
 <p id="source2"></p>
 <div id="documents" contenteditable="true" style="background-color:lightblue;border-radius:5px;border:5px ridge;font-size:12px;padding:5px">Edit here</div>
 <script>
+function convertimage(){
+	l=0;
+	for (letter in document.getElementById("documents").innerHTML){
+		document.getElementById("documents").innerHTML=document.getElementById("documents").innerHTML.replace("<img ","<img``* ");
+	}
+	for (letter in document.getElementById("documents").innerHTML){
+		document.getElementById("documents").innerHTML=document.getElementById("documents").innerHTML.replace("<img``*","<img style='float:left;border:5px ridge;border-radius:15px;width:"+document.getElementById("imagewidth").value+"' id='image-"+l+"' onmousedown='readimage("+l+")'");
+		l+=1;
+	}
+}
+function readimage(idofimage){
+	idofimage="image-"+idofimage;
+	urlofimage=document.getElementById(idofimage).src;
+	window.open(urlofimage);
+}
 function sizeconvert(){
 	for (letter in document.getElementById("documents").innerHTML){
-		document.getElementById("documents").innerHTML=document.getElementById("documents").innerHTML.replace("++","<big>").replace("--","<small>").replace("~~","<hr><hr class='break'>");
+		document.getElementById("documents").innerHTML=document.getElementById("documents").innerHTML.replace("++","<big>").replace("--","<small>").replace("~~","<hr><hr class='break'>").replace("&gt;","<span style='background-color:grey;width:5px'>&nbsp;&nbsp;</span>&nbsp;");
 	}
+	doc=document.getElementById("documents").innerHTML;
+	doc2="";
+	table=false
+	tr=false
+	td=false
+	st=false
+	for (letter in doc){
+		if (doc[letter] == "`" && table==false){
+			table=true
+			doc2+="<table style='border:1px solid black'>";
+		}
+		else if (doc[letter] == "`" && table==true){
+			table=true
+			doc2+="</table>";
+		}
+		else if (doc[letter] == "_" && tr==false && table==true){
+			tr=true
+			doc2+="<tr style='border:1px solid black'>";
+		}
+		else if (doc[letter] == "_" && tr==true && table==true){
+			tr=false
+			doc2+="</tr>";
+		}
+		else if (doc[letter] == "#" && tr==true && td==false){
+			td=true
+			doc2+="<td style='border:1px solid black'>";
+		}
+		else if (doc[letter] == "#" && tr==true && td==true){
+			td=false
+			doc2+="</td>";
+		}
+		else if (doc[letter] == "*" && tr==true && td==false){
+			td=true
+			doc2+="<th style='border:1px solid black'>";
+		}
+		else if (doc[letter] == "*" && tr==true && td==true){
+			td=false
+			doc2+="</th>";
+		}
+		else if (doc[letter] == "°" && st==false){
+			doc2+="<span style='text-decoration: line-through;'>";
+			st=true
+		}
+		else if (doc[letter] == "°" && st==true){
+			doc2+="</span>";
+			st=false
+		}
+		else{
+			doc2+=doc[letter];
+		}
+	}
+	document.getElementById("documents").innerHTML=doc2
 }
 function savesource(){
 	alert("Copying the document");
@@ -50,10 +122,26 @@ function newdoc(){
 	alert("Created new document");
 }
 function fontselect(){
+	document.getElementById("fontface2").value=document.getElementById("fontface").value
 	document.getElementById("documents").style.fontFamily=document.getElementById("fontface").value
 }
 function settitle(){
+	document.getElementById("title2").value=document.getElementById("title").value
 	document.title=document.getElementById("title").value
+}
+function fontselect2(){
+	document.getElementById("fontface").value=document.getElementById("fontface2").value
+	document.getElementById("documents").style.fontFamily=document.getElementById("fontface2").value
+}
+function settitle2(){
+	document.getElementById("title").value=document.getElementById("title2").value
+	document.title=document.getElementById("title2").value
+}
+function setimage(){
+	document.getElementById("imagewidth2").value=document.getElementById("imagewidth").value
+}
+function setimage2(){
+	document.getElementById("imagewidth").value=document.getElementById("imagewidth2").value
 }
 function printdoc(){
 	alert("Copying the document");
@@ -69,4 +157,27 @@ function printdoc(){
 	alert("Opening Printer")
 	print()
 }
+function inserttube(){
+	doc=document.getElementById("documents")
+	doc.innerHTML+='<iframe style="border: 5px ridge red;border-radius:10px" title="Videoplayer" id="_ytplayer1610" allow="autoplay" width="500" height="360" src="https://www.youtube.com/embed/'+document.getElementById("tube").value+'?autoplay=1&amp;enablejsapi=1&amp;origin=https://www.bing.com&amp;rel=0" frameborder="0" allowfullscreen></iframe>'
+}
 </script>
+<input placeholder="YouTube Video to insert" id="tube"><button onclick="inserttube()">Insert</button><br>
+Tables:<br>
+` start/stop of table, _ start/stop of row<br>
+# start/stop of cell, * start/stop of first cell<br>
+<i>&gt;</i> for a highlight in the line<br>
+<i>~~</i> to start a new side, ° start/end of strikethrough<br>
+<i>++</i> for bigger text, <i>--</i> for smaller text<br>
+<b>Strg</b> + <b>u</b> for underlined text<br>
+<b>Strg</b> + <b>i</b> for italic text<br>
+<b>Strg</b> + <b>b</b> for bold text<br>
+<b>Strg</b> + <b>s</b> to save the document on the desktop<br>
+<input type="text" placeholder="Select your font" id="fontface2" oninput="fontselect2()">
+<input type="text" placeholder="Title" id="title2" oninput="settitle2()"><input placeholder="Image width" id="imagewidth2" oninput="setimage2()"><br>
+<button onclick="printdoc()">Print</button>
+<button onclick="savesource()">Save</button>
+<button onclick="loadsource()">Load</button>
+<button onclick="sizeconvert()">Convert</button>
+<button onclick="newdoc()">New</button>
+<button onclick="convertimage()">Convert Image</button>
