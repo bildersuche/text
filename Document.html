@@ -6,11 +6,17 @@
 <button onclick="convertimage()">Convert Image</button><br>
 <input type="text" placeholder="Select your font" id="fontface" oninput="fontselect()">
 <input type="text" placeholder="Title" id="title" oninput="settitle()"><input placeholder="Image width" id="imagewidth" oninput="setimage()"><br>
+<b>F2</b> to preview the document<br>
 <b>Strg</b> + <b>s</b> to save the document on the desktop<br>
 <b>Strg</b> + <b>b</b> for bold text<br>
 <b>Strg</b> + <b>i</b> for italic text<br>
 <b>Strg</b> + <b>u</b> for underlined text<br>
+<b>Strg</b> + <b>v</b> insert something<br>
+<b>Strg</b> + <b>c</b> copy something<br>
 <i>&gt;</i> for a highlight in the line<br>
+← for left align, → for right align, ↔ for center align<br>
+<i>^</i> start/end of header, <i>§</i>start/end of footer<br>
+<i>[&nbsp;LINK&nbsp;|&nbsp;Text&nbsp;]</i> for a link<br>
 <i>++</i> for bigger text, <i>--</i> for smaller text<br>
 <i>~~</i> to start a new side, ° start/end of strikethrough<br>
 Tables:<br>
@@ -18,8 +24,19 @@ Tables:<br>
 # start/stop of cell, * start/stop of first cell<br>
 <textarea hidden id="source1"></textarea><button id="loadit" hidden onclick="loaditnow()">Load</button>
 <p id="source2"></p>
-<div id="documents" contenteditable="true" style="background-color:lightblue;border-radius:5px;border:5px ridge;font-size:12px;padding:5px">Edit here</div>
+<div id="documents" onkeydown="keypress()" contenteditable="true" style="background-color:lightblue;border-radius:5px;border:5px ridge;font-size:12px;padding:5px">Edit here</div>
 <script>
+function keypress(){
+	if (event.key=="F2"){
+		val=document.getElementById("documents").innerHTML
+		val='<div style="font-size:12px;padding:5px;font-family:'+document.getElementById("fontface").value+'">'+val+'</div>'
+		val+='<style>.break {page-break-before: always;}</style>'
+		document.open()
+		document.write(val)
+		document.close()
+		return true;
+	}
+}
 function convertimage(){
 	l=0;
 	for (letter in document.getElementById("documents").innerHTML){
@@ -37,7 +54,7 @@ function readimage(idofimage){
 }
 function sizeconvert(){
 	for (letter in document.getElementById("documents").innerHTML){
-		document.getElementById("documents").innerHTML=document.getElementById("documents").innerHTML.replace("++","<big>").replace("--","<small>").replace("~~","<hr><hr class='break'>").replace("&gt;","<span style='background-color:grey;width:5px'>&nbsp;&nbsp;</span>&nbsp;");
+		document.getElementById("documents").innerHTML=document.getElementById("documents").innerHTML.replace("++","<big>").replace("--","<small>").replace("~~","<hr><hr class='break'>").replace("&gt;","<span style='background-color:grey;width:5px'>&nbsp;&nbsp;</span>&nbsp;").replace("←","<div style='text-align:text-left'>").replace("→","<div style='text-align:right'>").replace("↔","<div style='text-align:center'>");
 	}
 	doc=document.getElementById("documents").innerHTML;
 	doc2="";
@@ -45,6 +62,9 @@ function sizeconvert(){
 	tr=false
 	td=false
 	st=false
+	header=false
+	footer=false
+	link=false
 	for (letter in doc){
 		if (doc[letter] == "`" && table==false){
 			table=true
@@ -85,6 +105,33 @@ function sizeconvert(){
 		else if (doc[letter] == "°" && st==true){
 			doc2+="</span>";
 			st=false
+		}
+		else if (doc[letter] == "^" && header==false){
+			doc2+="<div style='background-color:darkblue;color:lightblue;border-top-left-radius:20px;border-top-right-radius:20px;'>";
+			header=true;
+		}
+		else if (doc[letter] == "^" && header==true){
+			doc2+="</div>";
+			header=false;
+		}
+		else if (doc[letter] == "§" && footer==false){
+			doc2+="<div style='background-color:darkblue;color:lightblue;border-bottom-left-radius:20px;border-bottom-right-radius:20px;'>";
+			footer=true;
+		}
+		else if (doc[letter] == "§" && footer==true){
+			doc2+="</div>";
+			footer=false;
+		}
+		else if (doc[letter] == "[" && link==false){
+			doc2+="<a href='";
+			link=true
+		}
+		else if (doc[letter] == "|" && link==true){
+			doc2+="'>";
+		}
+		else if (doc[letter] == " " || doc[letter] == "]" && link==true){
+			doc2+="</a>";
+			link=false;
 		}
 		else{
 			doc2+=doc[letter];
@@ -169,10 +216,16 @@ Tables:<br>
 <i>&gt;</i> for a highlight in the line<br>
 <i>~~</i> to start a new side, ° start/end of strikethrough<br>
 <i>++</i> for bigger text, <i>--</i> for smaller text<br>
+<i>[&nbsp;LINK&nbsp;|&nbsp;Text&nbsp;]</i> for a link<br>
+<i>^</i> start/end of header, <i>§</i>start/end of footer<br>
+← for left align, → for right align, ↔ for center align<br>
+<b>Strg</b> + <b>c</b> copy something<br>
+<b>Strg</b> + <b>v</b> insert something<br>
 <b>Strg</b> + <b>u</b> for underlined text<br>
 <b>Strg</b> + <b>i</b> for italic text<br>
 <b>Strg</b> + <b>b</b> for bold text<br>
 <b>Strg</b> + <b>s</b> to save the document on the desktop<br>
+<b>F2</b> to preview the document<br>
 <input type="text" placeholder="Select your font" id="fontface2" oninput="fontselect2()">
 <input type="text" placeholder="Title" id="title2" oninput="settitle2()"><input placeholder="Image width" id="imagewidth2" oninput="setimage2()"><br>
 <button onclick="printdoc()">Print</button>
